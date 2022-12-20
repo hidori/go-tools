@@ -1,0 +1,3 @@
+genfldnam
+genprop
+printast

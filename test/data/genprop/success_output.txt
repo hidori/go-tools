@@ -1,0 +1,117 @@
+package data
+
+import (
+	"fmt"
+	"go/ast"
+	"regexp"
+)
+
+// int
+
+func (t *SuccessStruct) GetInt1() int {
+	return t.int1
+}
+
+func (t *SuccessStruct) SetInt1(v int) {
+	t.int1 = v
+}
+
+func (t *SuccessStruct) GetInt2() *int {
+	return t.int2
+}
+
+func (t *SuccessStruct) SetInt2(v *int) {
+	t.int2 = v
+}
+
+// string
+
+func (t *SuccessStruct) GetString1() string {
+	return t.string1
+}
+
+func (t *SuccessStruct) SetString1(v string) {
+	t.string1 = v
+}
+
+func (t *SuccessStruct) GetString2() *string {
+	return t.string2
+}
+
+func (t *SuccessStruct) SetString2(v *string) {
+	t.string2 = v
+}
+
+// interface{}
+
+func (t *SuccessStruct) GetInterface1() interface{} {
+	return t.interface1
+}
+
+func (t *SuccessStruct) SetInterface1(v interface{}) {
+	t.interface1 = v
+}
+
+func (t *SuccessStruct) GetInterface2() *interface{} {
+	return t.interface2
+}
+
+func (t *SuccessStruct) SetInterface2(v *interface{}) {
+	t.interface2 = v
+}
+
+// OtherSuccessStruct
+
+func (t *SuccessStruct) GetOtherSuccessStruct1() OtherSuccessStruct {
+	return t.otherSuccessStruct1
+}
+
+func (t *SuccessStruct) SetOtherSuccessStruct1(v OtherSuccessStruct) {
+	t.otherSuccessStruct1 = v
+}
+
+func (t *SuccessStruct) GetOtherSuccessStruct2() *OtherSuccessStruct {
+	return t.otherSuccessStruct2
+}
+
+func (t *SuccessStruct) SetOtherSuccessStruct2(v *OtherSuccessStruct) {
+	t.otherSuccessStruct2 = v
+}
+
+// ast.File
+
+func (t *SuccessStruct) GetAstFile1() ast.File {
+	return t.astFile1
+}
+
+func (t *SuccessStruct) SetAstFile1(v ast.File) {
+	t.astFile1 = v
+}
+
+func (t *SuccessStruct) GetAstFile2() *ast.File {
+	return t.astFile2
+}
+
+func (t *SuccessStruct) SetAstFile2(v *ast.File) {
+	t.astFile2 = v
+}
+
+// api
+
+func (t *SuccessStruct) GetAPI() string {
+	return t.api
+}
+
+func (t *SuccessStruct) GetAPIEndpoint() string {
+	return t.apiEndpoint
+}
+
+// OtherStruct
+
+func (t *OtherSuccessStruct) GetOtherInt1() int {
+	return t.otherInt1
+}
+
+func (t *OtherSuccessStruct) GetOtherInt2() int {
+	return t.otherInt2
+}

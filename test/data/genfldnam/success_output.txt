@@ -1,0 +1,21 @@
+package data
+
+const (
+	SuccessStructFieldNameInt1 = "Int1"
+	SuccessStructFieldNameInt2 = "Int2"
+
+	SuccessStructFieldNameOtherSuccessStruct1 = "OtherSuccessStruct1"
+	SuccessStructFieldNameOtherSuccessStruct2 = "OtherSuccessStruct2"
+
+	SuccessStructFieldNameAstFile1 = "AstFile1"
+	SuccessStructFieldNameAstFile2 = "AstFile2"
+)
+
+var SuccessStructAllFieldNames = []string{"Int1", "Int2", "OtherSuccessStruct1", "OtherSuccessStruct2", "AstFile1", "AstFile2"}
+
+const (
+	OtherSuccessStructFieldNameOtherInt1 = "OtherInt1"
+	OtherSuccessStructFieldNameOtherInt2 = "OtherInt2"
+)
+
+var OtherSuccessStructAllFieldNames = []string{"OtherInt1", "OtherInt2"}

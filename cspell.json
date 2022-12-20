@@ -1,0 +1,46 @@
+{
+  "version": "0.2",
+  "languageSettings": [
+    {
+      "languageId": "go",
+      "ignoreRegExpList": [
+        // ignore multiline imports
+        "import\\s*\\((.|[\r\n])*?\\)",
+        // ignore single line imports
+        "import\\s*.*\".*?\""
+      ]
+    }
+  ],
+  "dictionaries": ["hidori", "dev", "golang", "repo"],
+  "dictionaryDefinitions": [
+    {
+      "name": "hidori",
+      "path": "./.cspell/hidori.txt"
+    },
+    {
+      "name": "dev",
+      "path": "./.cspell/dev.txt"
+    },
+    {
+      "name": "golang",
+      "path": "./.cspell/golang.txt"
+    },
+    {
+      "name": "repo",
+      "path": "./cspell.txt"
+    }
+  ],
+  "ignorePaths": [
+    ".github",
+    "test",
+    ".dockerignore",
+    ".gitignore",
+    ".gitmodules",
+    ".golangci.yml",
+    "cspell.json",
+    "cspell.txt",
+    "Dockerfile",
+    "go.{mod,sum}",
+    "Makefile"
+  ]
+}

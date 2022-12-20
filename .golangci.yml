@@ -1,0 +1,44 @@
+run:
+  go: 1.20
+  skip-dirs:
+    - test
+    - example
+  skip-files:
+    - "\\.gen\\.go$"
+  tests: false
+
+linters:
+  enable-all: true
+  disable:
+    # disabled
+    - structcheck
+    # deprecated
+    - deadcode
+    - exhaustivestruct
+    - golint
+    - ifshort
+    - interfacer
+    - maligned
+    - nosnakecase
+    - scopelint
+    - varcheck
+    # do not use in this project
+    - cyclop
+    - depguard
+    - exhaustive
+    - exhaustruct
+    - funlen
+    - gochecknoglobals
+    - godox
+    - goerr113
+    - ireturn
+    - lll
+    - nilnil
+    - prealloc
+    - revive
+    - varnamelen
+    # temporary dsiabled, need discussions
+
+linters-settings:
+  gocyclo:
+    min-complexity: 20

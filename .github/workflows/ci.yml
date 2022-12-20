@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  vars:
+    name: Vars
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      GOLANG_VERSION: ${{ steps.golang.outputs.GOLANG_VERSION }}
+      GOLANGCI_LINT_VERSION: ${{ steps.golangci-lint.outputs.GOLANGCI_LINT_VERSION }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up GOLANG_VERSION
+        id: golang
+        run: |
+          echo "GOLANG_VERSION=$(cat ./.go-version)" >> $GITHUB_OUTPUT
+      - name: Set up GOLANGCI_LINT_VERSION
+        id: golangci-lint
+        run: |
+          echo "GOLANGCI_LINT_VERSION=v1.52.2" >> $GITHUB_OUTPUT
+
+  spell:
+    name: Spell
+    runs-on: ubuntu-20.04
+    timeout-minutes: 30
+    needs: vars
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: true
+      - run: make spell
+
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-20.04
+    timeout-minutes: 30
+    needs: vars
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ needs.vars.outputs.GOLANG_VERSION }}
+          cache: false
+      - uses: golangci/golangci-lint-action@v3
+        with:
+          version:  ${{ needs.vars.outputs.GOLANGCI_LINT_VERSION }}
+          only-new-issues: true
+
+  test:
+    name: Test
+    runs-on: ubuntu-20.04
+    timeout-minutes: 30
+    needs: vars
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ needs.vars.outputs.GOLANG_VERSION }}
+          cache: true
+          cache-dependency-path: go.sum
+      - run: |
+          make test
+      - uses: shogo82148/actions-goveralls@v1
+        with:
+          path-to-profile: ./profile.cov
+
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+    timeout-minutes: 30
+    needs:
+      - vars
+      - spell
+      - lint
+      - test
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          make build
