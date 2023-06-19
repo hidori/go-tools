@@ -40,6 +40,19 @@ func TestGenerator_Generate(t *testing.T) {
 			},
 		},
 		{
+			name:   "success: returns []ast.Decl",
+			input:  "../test/data/genfldnam/success_input.go",
+			output: "../test/data/genfldnam/success_output2.txt",
+			fields: fields{
+				config: &GeneratorConfig{
+					TagName:        "genfldnam",
+					Skewer:         "FieldName",
+					AllNames:       false,
+					AllNamesSuffix: "AllFieldNames",
+				},
+			},
+		},
+		{
 			name:  "fail: returns []ast.Decl",
 			input: "../test/data/genfldnam/fail_input.go",
 			fields: fields{
