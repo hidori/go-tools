@@ -73,3 +73,39 @@ func TestValueOrDefault(t *testing.T) {
 		})
 	}
 }
+
+func TestValueOrEmpty(t *testing.T) {
+	type args struct {
+		p *int
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "success: returns value",
+			args: args{
+				p: func(v int) *int {
+					return &v
+				}(1),
+			},
+			want: 1,
+		},
+		{
+			name: "success: returns empty",
+			args: args{
+				p: nil,
+			},
+			want: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := ValueOrEmpty(tt.args.p)
+			if !assert.Equal(t, tt.want, got) {
+				return
+			}
+		})
+	}
+}
