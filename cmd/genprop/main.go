@@ -40,11 +40,32 @@ func main() {
 		os.Exit(exitCodeUsage)
 	}
 
-	err := run(config(), args[0], os.Stdout)
+	err := run(os.Stdout, args[0])
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(exitCodeUsage)
 	}
+}
+
+func run(writer io.Writer, fileName string) error {
+	f, err := parser.ParseFile(token.NewFileSet(), fileName, nil, parser.AllErrors)
+	if err != nil {
+		return errors.Wrap(err, "fail to parser.ParseFile()")
+	}
+
+	generator := genprop.NewGenerator(config())
+
+	decls, err := generator.Generate(token.NewFileSet(), f)
+	if err != nil {
+		return errors.Wrap(err, "fail to generator.Generate()")
+	}
+
+	err = output(writer, decls, f.Name.Name)
+	if err != nil {
+		return errors.Wrap(err, "fail to output()")
+	}
+
+	return nil
 }
 
 func config() *genprop.GeneratorConfig {
@@ -54,40 +75,24 @@ func config() *genprop.GeneratorConfig {
 	}
 }
 
-func run(config *genprop.GeneratorConfig, fileName string, writer io.Writer) error {
-	f, err := parser.ParseFile(token.NewFileSet(), fileName, nil, parser.AllErrors)
-	if err != nil {
-		return errors.Wrap(err, "fail to parser.ParseFile()")
-	}
-
-	generator := genprop.NewGenerator(config)
-
-	fset := token.NewFileSet()
-
-	decls, err := generator.Generate(fset, f)
-	if err != nil {
-		return errors.Wrap(err, "fail to generator.Generate()")
-	}
-
+func output(writer io.Writer, decls []ast.Decl, packageName string) error {
 	buffer := bytes.NewBuffer([]byte{})
 
-	err = format.Node(buffer, fset, &ast.File{
-		Name:  ast.NewIdent(f.Name.Name),
+	err := format.Node(buffer, token.NewFileSet(), &ast.File{
+		Name:  ast.NewIdent(packageName),
 		Decls: decls,
 	})
 	if err != nil {
 		return errors.Wrap(err, "fail to format.Node()")
 	}
 
-	output, err := imports.Process("<genprop>", buffer.Bytes(), &imports.Options{
-		FormatOnly: false,
-	})
+	cooked, err := imports.Process("<"+tagName+">", buffer.Bytes(), &imports.Options{FormatOnly: false})
 	if err != nil {
 		return errors.Wrap(err, "fail to imports.Process()")
 	}
 
 	_, _ = fmt.Fprintln(writer, doNotEdit)
-	_, _ = writer.Write(output)
+	_, _ = writer.Write(cooked)
 
 	return nil
 }
