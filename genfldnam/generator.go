@@ -85,11 +85,9 @@ func (g *Generator) fromTypeSpec(typeSpec *ast.TypeSpec) ([]ast.Decl, error) {
 		g.newFieldNameGenDecl(specs),
 	}
 
-	if !g.config.AllNames {
-		return decls, nil
+	if g.config.AllNames {
+		decls = append(decls, g.newAllFieldNamesGenDecl(typeSpec.Name.Name, values))
 	}
-
-	decls = append(decls, g.newAllFieldNamesGenDecl(typeSpec.Name.Name, values))
 
 	return decls, nil
 }
