@@ -127,11 +127,7 @@ func (g *Generator) fromFieldList(structName string, fieldList *ast.FieldList) (
 }
 
 func (g *Generator) fromField(structName string, field *ast.Field) (ast.Spec, ast.Expr, error) {
-	directive, err := g.fromTag(field.Tag)
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "fail to g.fromTag()")
-	}
-
+	directive := g.fromTag(field.Tag)
 	if len(directive) == 0 || directive == "-" {
 		return nil, nil, nil
 	}
@@ -146,19 +142,15 @@ func (g *Generator) fromField(structName string, field *ast.Field) (ast.Spec, as
 	return spec, value, nil
 }
 
-func (g *Generator) fromTag(tag *ast.BasicLit) (string, error) {
+func (g *Generator) fromTag(tag *ast.BasicLit) string {
 	if tag == nil {
-		return "", nil
+		return ""
 	}
 
-	tagValue, err := strconv.Unquote(tag.Value)
-	if err != nil {
-		return "", errors.Wrapf(err, "fail to strconv.Unquote() s=%s", tag.Value)
-	}
-
+	tagValue, _ := strconv.Unquote(tag.Value)
 	directive := strings.Trim(reflect.StructTag(tagValue).Get(g.config.TagName), " ")
 
-	return directive, nil
+	return directive
 }
 
 func (g *Generator) newFieldNameGenDecl(specs []ast.Spec) *ast.GenDecl {
