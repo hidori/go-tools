@@ -68,6 +68,13 @@ jobs:
       - uses: shogo82148/actions-goveralls@v1
         with:
           path-to-profile: ./profile.cov
+      - run: |
+          sed -i 's/^github.com\/hidori\/go-tools\///' ./profile.cov
+      - uses: paambaati/codeclimate-action@v4.0.0
+        env:
+          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+        with:
+          coverageLocations: ./profile.cov:gocov
 
   build:
     name: Build
