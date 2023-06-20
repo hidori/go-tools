@@ -51,14 +51,14 @@ func (g *Generator) fromGenDecl(decl *ast.GenDecl) ([]ast.Decl, error) {
 		return []ast.Decl{decl}, nil
 
 	case token.TYPE:
-		return g.fromTypeDecl(decl)
+		return g.fromTypeGenDecl(decl)
 
 	default:
 		return nil, nil
 	}
 }
 
-func (g *Generator) fromTypeDecl(decl *ast.GenDecl) ([]ast.Decl, error) {
+func (g *Generator) fromTypeGenDecl(decl *ast.GenDecl) ([]ast.Decl, error) {
 	var decls []ast.Decl
 
 	for _, spec := range decl.Specs {
@@ -79,16 +79,7 @@ func (g *Generator) fromTypeSpec(spec *ast.TypeSpec) ([]ast.Decl, error) {
 		return nil, nil
 	}
 
-	decls, err := g.fromStructType(spec.Name.Name, structType)
-	if err != nil {
-		return nil, errors.Wrap(err, "fail to g.fromStructType()")
-	}
-
-	return decls, nil
-}
-
-func (g *Generator) fromStructType(structName string, structType *ast.StructType) ([]ast.Decl, error) {
-	decls, err := g.fromFieldList(structName, structType.Fields)
+	decls, err := g.fromFieldList(spec.Name.Name, structType.Fields)
 	if err != nil {
 		return nil, errors.Wrap(err, "fail to g.fromFieldList()")
 	}

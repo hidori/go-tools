@@ -72,16 +72,7 @@ func (g *Generator) fromTypeSpec(typeSpec *ast.TypeSpec) ([]ast.Decl, error) {
 		return nil, nil
 	}
 
-	decls, err := g.fromStructType(typeSpec.Name.Name, structType)
-	if err != nil {
-		return nil, errors.Wrap(err, "fail to g.fromStructType()")
-	}
-
-	return decls, nil
-}
-
-func (g *Generator) fromStructType(structName string, structType *ast.StructType) ([]ast.Decl, error) {
-	specs, values, err := g.fromFieldList(structName, structType.Fields)
+	specs, values, err := g.fromFieldList(typeSpec.Name.Name, structType.Fields)
 	if err != nil {
 		return nil, errors.Wrap(err, "fail to g.fromFieldList()")
 	}
@@ -98,7 +89,7 @@ func (g *Generator) fromStructType(structName string, structType *ast.StructType
 		return decls, nil
 	}
 
-	decls = append(decls, g.newAllFieldNamesGenDecl(structName, values))
+	decls = append(decls, g.newAllFieldNamesGenDecl(typeSpec.Name.Name, values))
 
 	return decls, nil
 }
