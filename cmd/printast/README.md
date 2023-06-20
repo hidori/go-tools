@@ -17,7 +17,7 @@ usage: printast <FILE>
 
 ### Example #1
 
-`example.go`
+example.go
 ```go
 package example
 
@@ -33,7 +33,7 @@ run CLI
 printast example.go > example.txt
 ```
 
-`example.txt`
+example.txt
 ```text
      0  *ast.File {
      1  .  Package: -
@@ -59,21 +59,5 @@ printast example.go > example.txt
     21  .  .  .  Rparen: -
     22  .  .  }
     23  .  .  1: *ast.FuncDecl {
-    24  .  .  .  Name: *ast.Ident {
-    25  .  .  .  .  NamePos: -
-    26  .  .  .  .  Name: "main"
-    27  .  .  .  .  Obj: *ast.Object {
-    28  .  .  .  .  .  Kind: func
-    29  .  .  .  .  .  Name: "main"
-    30  .  .  .  .  .  Decl: *(obj @ 23)
-    31  .  .  .  .  }
-    32  .  .  .  }
-    33  .  .  .  Type: *ast.FuncType {
-    34  .  .  .  .  Func: -
-    35  .  .  .  .  Params: *ast.FieldList {
-    36  .  .  .  .  .  Opening: -
-    37  .  .  .  .  .  Closing: -
-    38  .  .  .  .  }
-    39  .  .  .  }
 (omit)
 ```
