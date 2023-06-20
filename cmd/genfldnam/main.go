@@ -43,11 +43,37 @@ func main() {
 		os.Exit(exitCodeUsage)
 	}
 
-	err := run(config(), args[0], os.Stdout)
+	err := run(os.Stdout, args[0])
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(exitCodeError)
 	}
+}
+
+func run(writer io.Writer, fileName string) error {
+	f, err := parser.ParseFile(token.NewFileSet(), fileName, nil, parser.AllErrors)
+	if err != nil {
+		return errors.Wrap(err, "fail to parser.ParseFile()")
+	}
+
+	generator := genfldnam.NewGenerator(config())
+
+	decls, err := generator.Generate(token.NewFileSet(), f)
+	if err != nil {
+		return errors.Wrap(err, "fail to generator.Generate()")
+	}
+
+	packageName := f.Name.Name
+	if *packageFlag != "" {
+		packageName = *packageFlag
+	}
+
+	err = output(writer, decls, packageName)
+	if err != nil {
+		return errors.Wrap(err, "fail to output()")
+	}
+
+	return nil
 }
 
 func config() *genfldnam.GeneratorConfig {
@@ -59,30 +85,11 @@ func config() *genfldnam.GeneratorConfig {
 	}
 }
 
-func run(config *genfldnam.GeneratorConfig, fileName string, writer io.Writer) error {
-	f, err := parser.ParseFile(token.NewFileSet(), fileName, nil, parser.AllErrors)
-	if err != nil {
-		return errors.Wrap(err, "fail to parser.ParseFile()")
-	}
-
-	generator := genfldnam.NewGenerator(config)
-
-	fset := token.NewFileSet()
-
-	decls, err := generator.Generate(fset, f)
-	if err != nil {
-		return errors.Wrap(err, "fail to generator.Generate()")
-	}
-
+func output(writer io.Writer, decls []ast.Decl, packageName string) error {
 	buffer := bytes.NewBuffer([]byte{})
 	fmt.Fprintln(buffer, doNotEdit)
 
-	packageName := f.Name.Name
-	if *packageFlag != "" {
-		packageName = *packageFlag
-	}
-
-	err = format.Node(buffer, fset, &ast.File{
+	err := format.Node(buffer, token.NewFileSet(), &ast.File{
 		Name:  ast.NewIdent(packageName),
 		Decls: decls,
 	})
