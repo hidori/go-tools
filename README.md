@@ -7,9 +7,9 @@
 
 ## Command Line Tools
 
-* [cmd/genfldnam](./cmd/genfldnam/)
-* [cmd/genprop](./cmd/genprop/)
-* [cmd/printast](./cmd/printast)
+* [genfldnam](./cmd/genfldnam/)
+* [genprop](./cmd/genprop/)
+* [printast](./cmd/printast)
 
 ## Reusable Libraries
 
