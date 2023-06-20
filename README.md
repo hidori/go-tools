@@ -11,7 +11,7 @@
 * [cmd/genprop](./cmd/genprop/)
 * [cmd/printast](./cmd/printast)
 
-## Packages
+## Reusable Libraries
 
 * [astutil](./astutil/)
 * [empty](./empty/)
