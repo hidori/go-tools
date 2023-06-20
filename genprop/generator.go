@@ -112,10 +112,7 @@ func (g *Generator) fromFieldList(structName string, fieldList *ast.FieldList) (
 }
 
 func (g *Generator) fromField(structName string, field *ast.Field) ([]ast.Decl, error) {
-	directives, err := g.fromTag(field.Tag)
-	if err != nil {
-		return nil, errors.Wrap(err, "fail to g.fromTag()")
-	}
+	directives := g.fromTag(field.Tag)
 
 	var decls []ast.Decl
 
@@ -143,19 +140,15 @@ func (g *Generator) fromField(structName string, field *ast.Field) ([]ast.Decl, 
 	return decls, nil
 }
 
-func (g *Generator) fromTag(tag *ast.BasicLit) ([]string, error) {
+func (g *Generator) fromTag(tag *ast.BasicLit) []string {
 	if tag == nil {
-		return nil, nil
+		return nil
 	}
 
-	tagValue, err := strconv.Unquote(tag.Value)
-	if err != nil {
-		return nil, errors.Wrapf(err, "fail to strconv.Unquote() s=%s", tag.Value)
-	}
-
+	tagValue, _ := strconv.Unquote(tag.Value)
 	directives := strings.Split(strings.Trim(reflect.StructTag(tagValue).Get(g.config.TagName), " "), ",")
 
-	return directives, nil
+	return directives
 }
 
 func (g *Generator) newGetterFuncDecl(structName string, field *ast.Field) ast.Decl {
