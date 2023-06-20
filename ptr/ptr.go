@@ -1,5 +1,7 @@
 package ptr
 
+import "github.com/hidori/go-tools/empty"
+
 func Pointer[T any](v T) *T {
 	return &v
 }
@@ -10,4 +12,8 @@ func ValueOrDefault[T any](p *T, _default T) T {
 	}
 
 	return *p
+}
+
+func ValueOrEmpty[T any](p *T) T {
+	return ValueOrDefault(p, empty.Empty[T]())
 }
