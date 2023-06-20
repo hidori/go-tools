@@ -28,7 +28,7 @@ option(s):
 
 ### Example #1
 
-`example.go`
+example.go
 ```golang
 package example
 
@@ -57,7 +57,7 @@ const (
 
 ### Example #2
 
-`example.go`
+example.go
 ```golang
 package example
 
