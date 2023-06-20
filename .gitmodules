@@ -1,0 +1,3 @@
+[submodule ".cspell"]
+	path = .cspell
+	url = git@github.com:hidori/.cspell.git
