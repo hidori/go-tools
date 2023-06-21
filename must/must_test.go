@@ -88,12 +88,12 @@ func TestMust2(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.wantPanic {
 				assert.Panics(t, func() {
-					_, _ = Get1(tt.args.f)
+					_, _ = Get2(tt.args.f)
 				})
 				return
 			}
 
-			got, got1 := Get1(tt.args.f)
+			got, got1 := Get2(tt.args.f)
 			if !assert.Equal(t, tt.want, got) {
 				return
 			}
