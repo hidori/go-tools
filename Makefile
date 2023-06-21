@@ -36,7 +36,7 @@ cyclo:
 
 .PHONY: lint
 lint:
-	golangci-lint run -v ./...
+	golangci-lint run ./...
 
 .PHONY: test
 test:
