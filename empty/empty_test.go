@@ -1,4 +1,4 @@
-package types
+package empty
 
 import (
 	"testing"
@@ -18,7 +18,7 @@ func TestEmptyOfInt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := EmptyOf[int]()
+			got := Of[int]()
 			if !assert.Equal(t, tt.want, got) {
 				return
 			}
@@ -38,7 +38,7 @@ func TestEmptyOfIntPtr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := EmptyOf[*int]()
+			got := Of[*int]()
 			if !assert.Equal(t, tt.want, got) {
 				return
 			}
@@ -58,7 +58,7 @@ func TestEmptyOfString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := EmptyOf[string]()
+			got := Of[string]()
 			if !assert.Equal(t, tt.want, got) {
 				return
 			}
@@ -78,7 +78,7 @@ func TestEmptyOfStringPtr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := EmptyOf[*string]()
+			got := Of[*string]()
 			if !assert.Equal(t, tt.want, got) {
 				return
 			}
@@ -100,7 +100,7 @@ func TestEmptyOfStruct(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := EmptyOf[TestStruct]()
+			got := Of[TestStruct]()
 			if !assert.Equal(t, tt.want, got) {
 				return
 			}
@@ -122,7 +122,7 @@ func TestEmptyOfStructPtr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := EmptyOf[*TestStruct]()
+			got := Of[*TestStruct]()
 			if !assert.Equal(t, tt.want, got) {
 				return
 			}

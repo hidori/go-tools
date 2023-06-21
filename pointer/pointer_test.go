@@ -1,4 +1,4 @@
-package ptr
+package pointer
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPointerOf(t *testing.T) {
+func TestOf(t *testing.T) {
 	type args struct {
 		v int
 	}
@@ -27,7 +27,7 @@ func TestPointerOf(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := PointerOf(tt.args.v)
+			got := Of(tt.args.v)
 			if !assert.Equal(t, *tt.want, *got) {
 				return
 			}

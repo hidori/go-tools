@@ -22,7 +22,7 @@ func TestGetCallerInfo(t *testing.T) {
 			name: "success: returns CallerInfo",
 			want: CallerInfo{
 				OK:         true,
-				FileName:   "runtime/caller_info_test.go",
+				FileName:   "runtime/runtime_test.go",
 				LineNumber: 33,
 				FuncName:   "github.com/hidori/go-tools/runtime.TestGetCallerInfo.func1",
 			},

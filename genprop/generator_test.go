@@ -54,7 +54,7 @@ func TestGenerator_Generate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			fset := token.NewFileSet()
-			f := must.Must(func() (*ast.File, error) {
+			f := must.Get(func() (*ast.File, error) {
 				fmt.Println(tt.input)
 				return parser.ParseFile(token.NewFileSet(), tt.input, nil, parser.AllErrors)
 			})
@@ -74,7 +74,7 @@ func TestGenerator_Generate(t *testing.T) {
 
 			_want := bytes.NewBuffer([]byte{})
 			func() {
-				f := must.Must(func() (*ast.File, error) {
+				f := must.Get(func() (*ast.File, error) {
 					return parser.ParseFile(token.NewFileSet(), tt.output, nil, parser.AllErrors)
 				})
 				format.Node(_want, fset, f.Decls)
