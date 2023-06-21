@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPointer(t *testing.T) {
+func TestPointerOf(t *testing.T) {
 	type args struct {
 		v int
 	}
@@ -27,8 +27,12 @@ func TestPointer(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Pointer(tt.args.v)
+			got := PointerOf(tt.args.v)
 			if !assert.Equal(t, *tt.want, *got) {
+				return
+			}
+
+			if !assert.NotSame(t, tt.want, got) {
 				return
 			}
 		})

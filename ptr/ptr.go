@@ -2,7 +2,7 @@ package ptr
 
 import "github.com/hidori/go-tools/types"
 
-func Pointer[T any](v T) *T {
+func PointerOf[T any](v T) *T {
 	return &v
 }
 
