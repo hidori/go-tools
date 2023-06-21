@@ -1,8 +1,8 @@
-package empty
+package types
 
 import "reflect"
 
-func Empty[T any]() T {
+func EmptyOf[T any]() T {
 	var v T
 
 	rt := reflect.TypeOf(v)
