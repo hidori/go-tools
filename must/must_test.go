@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMust(t *testing.T) {
+func TestGet1(t *testing.T) {
 	type args struct {
 		f func() (int, error)
 	}
@@ -40,12 +40,12 @@ func TestMust(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.wantPanic {
 				assert.Panics(t, func() {
-					_ = Get(tt.args.f)
+					_ = Get1(tt.args.f)
 				})
 				return
 			}
 
-			got := Get(tt.args.f)
+			got := Get1(tt.args.f)
 			if !assert.Equal(t, tt.want, got) {
 				return
 			}
@@ -53,7 +53,7 @@ func TestMust(t *testing.T) {
 	}
 }
 
-func TestMust2(t *testing.T) {
+func TestGet2(t *testing.T) {
 	type args struct {
 		f func() (int, int, error)
 	}
@@ -88,12 +88,12 @@ func TestMust2(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.wantPanic {
 				assert.Panics(t, func() {
-					_, _ = Get1(tt.args.f)
+					_, _ = Get2(tt.args.f)
 				})
 				return
 			}
 
-			got, got1 := Get1(tt.args.f)
+			got, got1 := Get2(tt.args.f)
 			if !assert.Equal(t, tt.want, got) {
 				return
 			}
@@ -105,7 +105,7 @@ func TestMust2(t *testing.T) {
 	}
 }
 
-func TestMust3(t *testing.T) {
+func TestGet3(t *testing.T) {
 	type args struct {
 		f func() (int, int, int, error)
 	}

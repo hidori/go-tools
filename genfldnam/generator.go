@@ -8,7 +8,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/barweiss/go-tuple"
 	"github.com/hidori/go-tools/astutil"
+	"github.com/hidori/go-tools/linqutil"
+	"github.com/makiuchi-d/linq/v2"
 	"github.com/pkg/errors"
 )
 
@@ -30,105 +33,91 @@ func NewGenerator(config *GeneratorConfig) *Generator {
 }
 
 func (g *Generator) Generate(fset *token.FileSet, f *ast.File) ([]ast.Decl, error) {
-	var decls []ast.Decl
+	e1 := linq.FromSlice(f.Decls)
+	e2 := linq.Select(e1, func(v ast.Decl) (*ast.GenDecl, error) {
+		return linqutil.AsOrEmpty[*ast.GenDecl](v)
+	})
+	e3 := linq.Where(e2, func(v *ast.GenDecl) (bool, error) {
+		return v != nil, nil
+	})
+	e4 := linq.SelectMany(e3, g.fromGenDecl, linqutil.PassThrough[ast.Decl])
 
-	for _, decl := range f.Decls {
-		if genDecl, ok := decl.(*ast.GenDecl); ok {
-			_decls, err := g.fromGenDecl(genDecl)
-			if err != nil {
-				return nil, err
-			}
-
-			decls = append(decls, _decls...)
-		}
+	decls, err := linq.ToSlice(e4)
+	if err != nil {
+		return nil, errors.Wrap(err, "fail to linq.ToSlice()")
 	}
 
 	return decls, nil
 }
 
-func (g *Generator) fromGenDecl(decl *ast.GenDecl) ([]ast.Decl, error) {
-	var decls []ast.Decl
+func (g *Generator) fromGenDecl(decl *ast.GenDecl) (linq.Enumerable[ast.Decl], error) {
+	switch decl.Tok {
+	case token.TYPE:
+		return g.fromTypeGenDecl(decl)
 
-	for _, spec := range decl.Specs {
-		typeSpec, ok := spec.(*ast.TypeSpec)
-		if !ok {
-			continue
-		}
-
-		_decls, err := g.fromTypeSpec(typeSpec)
-		if err != nil {
-			return nil, errors.Wrap(err, "fail to g.fromTypeSpec()")
-		}
-
-		decls = append(decls, _decls...)
+	default:
+		return linq.Empty[ast.Decl](), nil
 	}
-
-	return decls, nil
 }
 
-func (g *Generator) fromTypeSpec(typeSpec *ast.TypeSpec) ([]ast.Decl, error) {
+func (g *Generator) fromTypeGenDecl(decl *ast.GenDecl) (linq.Enumerable[ast.Decl], error) {
+	e1 := linq.FromSlice(decl.Specs)
+	e2 := linq.Select(e1, func(v ast.Spec) (*ast.TypeSpec, error) {
+		return linqutil.AsOrEmpty[*ast.TypeSpec](v)
+	})
+	e3 := linq.Where(e2, func(v *ast.TypeSpec) (bool, error) {
+		return v != nil, nil
+	})
+	e4 := linq.SelectMany(e3, g.fromTypeSpec, linqutil.PassThrough[ast.Decl])
+
+	return e4, nil
+}
+
+func (g *Generator) fromTypeSpec(typeSpec *ast.TypeSpec) (linq.Enumerable[ast.Decl], error) {
 	structType, ok := typeSpec.Type.(*ast.StructType)
 	if !ok {
-		return nil, nil
+		return linq.Empty[ast.Decl](), nil
 	}
 
-	specs, values, err := g.fromFieldList(typeSpec.Name.Name, structType.Fields)
+	decls, err := g.fromFieldList(typeSpec.Name.Name, structType.Fields)
 	if err != nil {
 		return nil, errors.Wrap(err, "fail to g.fromFieldList()")
 	}
 
-	if len(specs) < 1 {
-		return nil, nil
-	}
-
-	decls := []ast.Decl{
-		g.newFieldNameGenDecl(specs),
-	}
-
-	if g.config.AllNames {
-		decls = append(decls, g.newAllFieldNamesGenDecl(typeSpec.Name.Name, values))
-	}
-
 	return decls, nil
 }
 
-func (g *Generator) fromFieldList(structName string, fieldList *ast.FieldList) ([]ast.Spec, []ast.Expr, error) {
-	var (
-		specs  []ast.Spec
-		values []ast.Expr
-	)
+func (g *Generator) fromFieldList(structName string, fieldList *ast.FieldList) (linq.Enumerable[ast.Decl], error) {
+	e1 := linq.FromSlice(fieldList.List)
+	e2 := linq.Select(e1, func(v *ast.Field) (*tuple.T2[string, string], error) {
+		return g.fromField(structName, v)
+	})
+	e3 := linq.Where(e2, func(v *tuple.T2[string, string]) (bool, error) {
+		return v != nil, nil
+	})
 
-	for _, field := range fieldList.List {
-		spec, value, err := g.fromField(structName, field)
-		if err != nil {
-			return nil, nil, errors.Wrap(err, "fail to g.fromField()")
-		}
-
-		if spec == nil {
-			continue
-		}
-
-		specs = append(specs, spec)
-		values = append(values, value)
+	pair, err := linq.Aggregate(e3, &tuple.T2[[]ast.Spec, []ast.Expr]{}, g.fromStringStringPair)
+	if err != nil {
+		return nil, errors.Wrap(err, "fail to linq.Aggregate()")
 	}
 
-	return specs, values, nil
+	return g.fromSpecExprPair(structName, pair), nil
 }
 
-func (g *Generator) fromField(structName string, field *ast.Field) (ast.Spec, ast.Expr, error) {
+func (g *Generator) fromField(structName string, field *ast.Field) (*tuple.T2[string, string], error) {
 	directive := g.fromTag(field.Tag)
 	if len(directive) == 0 || directive == "-" {
-		return nil, nil, nil
+		return nil, nil
 	}
 
 	if directive != "+" {
-		return nil, nil, fmt.Errorf("invalid tag value '%s'", directive)
+		return nil, fmt.Errorf("invalid tag value '%s'", directive)
 	}
 
-	value := g.newFieldNameExpr(field)
-	spec := g.newFieldNameSpec(structName, field, value)
-
-	return spec, value, nil
+	return &tuple.T2[string, string]{
+		V1: fmt.Sprintf("%s%s%s", structName, g.config.Skewer, field.Names[0].Name),
+		V2: strconv.Quote(field.Names[0].Name),
+	}, nil
 }
 
 func (g *Generator) fromTag(tag *ast.BasicLit) string {
@@ -142,37 +131,49 @@ func (g *Generator) fromTag(tag *ast.BasicLit) string {
 	return directive
 }
 
-func (g *Generator) newFieldNameGenDecl(specs []ast.Spec) *ast.GenDecl {
-	return astutil.NewGenDecl(token.CONST, specs)
-}
-
-func (g *Generator) newAllFieldNamesGenDecl(structName string, values []ast.Expr) *ast.GenDecl {
-	return astutil.NewGenDecl(token.VAR, []ast.Spec{
-		astutil.NewValueSpec(
-			[]*ast.Ident{
-				astutil.NewIdent(fmt.Sprintf("%s%s", structName, g.config.AllNamesSuffix)),
-			},
-			[]ast.Expr{
-				astutil.NewCompositeLit(astutil.NewArrayType(astutil.NewIdent("string")), values),
-			},
-		),
-	})
-}
-
-func (g *Generator) newFieldNameExpr(field *ast.Field) ast.Expr {
-	return astutil.NewBasicLit(
+func (g *Generator) fromStringStringPair(acc *tuple.T2[[]ast.Spec, []ast.Expr], v *tuple.T2[string, string]) (*tuple.T2[[]ast.Spec, []ast.Expr], error) {
+	value := astutil.NewBasicLit(
 		token.STRING,
-		strconv.Quote(field.Names[0].Name),
+		v.V2,
 	)
-}
-
-func (g *Generator) newFieldNameSpec(structName string, field *ast.Field, value ast.Expr) ast.Spec {
-	return astutil.NewValueSpec(
+	spec := astutil.NewValueSpec(
 		[]*ast.Ident{
-			astutil.NewIdent(fmt.Sprintf("%s%s%s", structName, g.config.Skewer, field.Names[0].Name)),
+			astutil.NewIdent(v.V1),
 		},
 		[]ast.Expr{
 			value,
 		},
 	)
+	pair := tuple.New2(
+		append(acc.V1, spec),
+		append(acc.V2, value),
+	)
+
+	return &pair, nil
+}
+
+func (g *Generator) fromSpecExprPair(structName string, pair *tuple.T2[[]ast.Spec, []ast.Expr]) linq.Enumerable[ast.Decl] {
+	decls := linq.FromSlice([]ast.Decl{})
+
+	if len(pair.V1) < 1 {
+		return decls
+	}
+
+	decls = linqutil.Append(decls, ast.Decl(astutil.NewGenDecl(token.CONST, pair.V1)))
+
+	if g.config.AllNames {
+		decl := astutil.NewGenDecl(token.VAR, []ast.Spec{
+			astutil.NewValueSpec(
+				[]*ast.Ident{
+					astutil.NewIdent(fmt.Sprintf("%s%s", structName, g.config.AllNamesSuffix)),
+				},
+				[]ast.Expr{
+					astutil.NewCompositeLit(astutil.NewArrayType(astutil.NewIdent("string")), pair.V2),
+				},
+			),
+		})
+		decls = linqutil.Append(decls, ast.Decl(decl))
+	}
+
+	return decls
 }
