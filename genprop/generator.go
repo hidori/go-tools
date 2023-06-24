@@ -46,7 +46,6 @@ func (g *Generator) Generate(fset *token.FileSet, f *ast.File) ([]ast.Decl, erro
 	}
 
 	return decls, nil
-
 }
 
 func (g *Generator) fromGenDecl(decl *ast.GenDecl) (linq.Enumerable[ast.Decl], error) {
@@ -55,14 +54,14 @@ func (g *Generator) fromGenDecl(decl *ast.GenDecl) (linq.Enumerable[ast.Decl], e
 		return linq.FromSlice([]ast.Decl{decl}), nil
 
 	case token.TYPE:
-		return g.fromTypeGenDecl(decl)
+		return g.fromTypeGenDecl(decl), nil
 
 	default:
 		return linq.Empty[ast.Decl](), nil
 	}
 }
 
-func (g *Generator) fromTypeGenDecl(decl *ast.GenDecl) (linq.Enumerable[ast.Decl], error) {
+func (g *Generator) fromTypeGenDecl(decl *ast.GenDecl) linq.Enumerable[ast.Decl] {
 	e1 := linq.FromSlice(decl.Specs)
 	e2 := linq.Select(e1, func(v ast.Spec) (*ast.TypeSpec, error) {
 		return linqutil.AsOrEmpty[*ast.TypeSpec](v)
@@ -72,7 +71,7 @@ func (g *Generator) fromTypeGenDecl(decl *ast.GenDecl) (linq.Enumerable[ast.Decl
 	})
 	e4 := linq.SelectMany(e3, g.fromTypeSpec, linqutil.PassThrough[ast.Decl])
 
-	return e4, nil
+	return e4
 }
 
 func (g *Generator) fromTypeSpec(typeSpec *ast.TypeSpec) (linq.Enumerable[ast.Decl], error) {
@@ -81,15 +80,10 @@ func (g *Generator) fromTypeSpec(typeSpec *ast.TypeSpec) (linq.Enumerable[ast.De
 		return linq.Empty[ast.Decl](), nil
 	}
 
-	decls, err := g.fromFieldList(typeSpec.Name.Name, structType.Fields)
-	if err != nil {
-		return nil, errors.Wrap(err, "fail to g.fromFieldList()")
-	}
-
-	return decls, nil
+	return g.fromFieldList(typeSpec.Name.Name, structType.Fields), nil
 }
 
-func (g *Generator) fromFieldList(structName string, fieldList *ast.FieldList) (linq.Enumerable[ast.Decl], error) {
+func (g *Generator) fromFieldList(structName string, fieldList *ast.FieldList) linq.Enumerable[ast.Decl] {
 	e1 := linq.FromSlice(fieldList.List)
 	e2 := linq.SelectMany(e1,
 		func(v *ast.Field) (linq.Enumerable[ast.Decl], error) {
@@ -97,7 +91,7 @@ func (g *Generator) fromFieldList(structName string, fieldList *ast.FieldList) (
 		},
 		linqutil.PassThrough[ast.Decl])
 
-	return e2, nil
+	return e2
 }
 
 func (g *Generator) fromField(structName string, field *ast.Field) (linq.Enumerable[ast.Decl], error) {
@@ -129,7 +123,7 @@ func (g *Generator) fromTag(tag *ast.BasicLit) (linq.Enumerable[string], error) 
 
 	t1, err := strconv.Unquote(tag.Value)
 	if err != nil {
-		return linq.Empty[string](), nil
+		return nil, errors.Wrap(err, "fail to strconv.Unquote()")
 	}
 
 	t2 := strings.Trim(reflect.StructTag(t1).Get(g.config.TagName), " ")

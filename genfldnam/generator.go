@@ -53,14 +53,14 @@ func (g *Generator) Generate(fset *token.FileSet, f *ast.File) ([]ast.Decl, erro
 func (g *Generator) fromGenDecl(decl *ast.GenDecl) (linq.Enumerable[ast.Decl], error) {
 	switch decl.Tok {
 	case token.TYPE:
-		return g.fromTypeGenDecl(decl)
+		return g.fromTypeGenDecl(decl), nil
 
 	default:
 		return linq.Empty[ast.Decl](), nil
 	}
 }
 
-func (g *Generator) fromTypeGenDecl(decl *ast.GenDecl) (linq.Enumerable[ast.Decl], error) {
+func (g *Generator) fromTypeGenDecl(decl *ast.GenDecl) linq.Enumerable[ast.Decl] {
 	e1 := linq.FromSlice(decl.Specs)
 	e2 := linq.Select(e1, func(v ast.Spec) (*ast.TypeSpec, error) {
 		return linqutil.AsOrEmpty[*ast.TypeSpec](v)
@@ -70,7 +70,7 @@ func (g *Generator) fromTypeGenDecl(decl *ast.GenDecl) (linq.Enumerable[ast.Decl
 	})
 	e4 := linq.SelectMany(e3, g.fromTypeSpec, linqutil.PassThrough[ast.Decl])
 
-	return e4, nil
+	return e4
 }
 
 func (g *Generator) fromTypeSpec(typeSpec *ast.TypeSpec) (linq.Enumerable[ast.Decl], error) {
