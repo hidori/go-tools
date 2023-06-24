@@ -1,4 +1,4 @@
-package empty
+package types
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEmptyOfInt(t *testing.T) {
+func TestEmptyInt(t *testing.T) {
 	tests := []struct {
 		name string
 		want int
@@ -18,7 +18,7 @@ func TestEmptyOfInt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Of[int]()
+			got := Empty[int]()
 			if !assert.Equal(t, tt.want, got) {
 				return
 			}
@@ -26,7 +26,7 @@ func TestEmptyOfInt(t *testing.T) {
 	}
 }
 
-func TestEmptyOfIntPtr(t *testing.T) {
+func TestEmptyIntPtr(t *testing.T) {
 	tests := []struct {
 		name string
 		want *int
@@ -38,7 +38,7 @@ func TestEmptyOfIntPtr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Of[*int]()
+			got := Empty[*int]()
 			if !assert.Equal(t, tt.want, got) {
 				return
 			}
@@ -46,7 +46,7 @@ func TestEmptyOfIntPtr(t *testing.T) {
 	}
 }
 
-func TestEmptyOfString(t *testing.T) {
+func TestEmptyString(t *testing.T) {
 	tests := []struct {
 		name string
 		want string
@@ -58,7 +58,7 @@ func TestEmptyOfString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Of[string]()
+			got := Empty[string]()
 			if !assert.Equal(t, tt.want, got) {
 				return
 			}
@@ -66,7 +66,7 @@ func TestEmptyOfString(t *testing.T) {
 	}
 }
 
-func TestEmptyOfStringPtr(t *testing.T) {
+func TestEmptyStringPtr(t *testing.T) {
 	tests := []struct {
 		name string
 		want *string
@@ -78,7 +78,7 @@ func TestEmptyOfStringPtr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Of[*string]()
+			got := Empty[*string]()
 			if !assert.Equal(t, tt.want, got) {
 				return
 			}
@@ -86,7 +86,7 @@ func TestEmptyOfStringPtr(t *testing.T) {
 	}
 }
 
-func TestEmptyOfStruct(t *testing.T) {
+func TestEmptyStruct(t *testing.T) {
 	type TestStruct struct{}
 
 	tests := []struct {
@@ -100,7 +100,7 @@ func TestEmptyOfStruct(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Of[TestStruct]()
+			got := Empty[TestStruct]()
 			if !assert.Equal(t, tt.want, got) {
 				return
 			}
@@ -108,7 +108,7 @@ func TestEmptyOfStruct(t *testing.T) {
 	}
 }
 
-func TestEmptyOfStructPtr(t *testing.T) {
+func TestEmptyStructPtr(t *testing.T) {
 	type TestStruct struct{}
 
 	tests := []struct {
@@ -122,7 +122,41 @@ func TestEmptyOfStructPtr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Of[*TestStruct]()
+			got := Empty[*TestStruct]()
+			if !assert.Equal(t, tt.want, got) {
+				return
+			}
+		})
+	}
+}
+
+func TestAsOrEmptyInt(t *testing.T) {
+	type args struct {
+		v any
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "success: return 1",
+			args: args{
+				v: interface{}(1),
+			},
+			want: 1,
+		},
+		{
+			name: "success: return 0",
+			args: args{
+				v: interface{}("1"),
+			},
+			want: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := AsOrEmpty[int](tt.args.v)
 			if !assert.Equal(t, tt.want, got) {
 				return
 			}
