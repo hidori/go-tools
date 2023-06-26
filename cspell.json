@@ -11,11 +11,11 @@
       ]
     }
   ],
-  "dictionaries": ["hidori", "dev", "golang", "repo"],
+  "dictionaries": ["personal", "dev", "golang", "repo"],
   "dictionaryDefinitions": [
     {
-      "name": "hidori",
-      "path": "./.cspell/hidori.txt"
+      "name": "personal",
+      "path": "./.cspell/personal.txt"
     },
     {
       "name": "dev",
