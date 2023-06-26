@@ -6,7 +6,6 @@ import (
 	"go/token"
 	"reflect"
 	"strconv"
-	"strings"
 
 	"github.com/barweiss/go-tuple"
 	"github.com/hidori/go-tools/astutil"
@@ -105,12 +104,8 @@ func (g *Generator) fromFieldList(structName string, fieldList *ast.FieldList) (
 }
 
 func (g *Generator) fromField(structName string, field *ast.Field) (*tuple.T2[string, string], error) {
-	directive, err := g.fromTag(field.Tag)
-	if err != nil {
-		return nil, errors.Wrap(err, "fail to g.fromTag()")
-	}
-
-	if len(directive) == 0 || directive == "-" {
+	directive := g.fromTag(field.Tag)
+	if directive == "" || directive == "-" {
 		return nil, nil
 	}
 
@@ -124,19 +119,15 @@ func (g *Generator) fromField(structName string, field *ast.Field) (*tuple.T2[st
 	}, nil
 }
 
-func (g *Generator) fromTag(tag *ast.BasicLit) (string, error) {
+func (g *Generator) fromTag(tag *ast.BasicLit) string {
 	if tag == nil {
-		return "", nil
+		return ""
 	}
 
-	t1, err := strconv.Unquote(tag.Value)
-	if err != nil {
-		return "", errors.Wrap(err, "fail to strconv.Unquote()")
-	}
+	t1, _ := strconv.Unquote(tag.Value)
+	t2 := reflect.StructTag(t1).Get(g.config.TagName)
 
-	t2 := strings.Trim(reflect.StructTag(t1).Get(g.config.TagName), " ")
-
-	return t2, nil
+	return t2
 }
 
 func (g *Generator) fromStringStringPair(acc *tuple.T2[[]ast.Spec, []ast.Expr], v *tuple.T2[string, string]) (*tuple.T2[[]ast.Spec, []ast.Expr], error) {
