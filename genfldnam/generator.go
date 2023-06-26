@@ -105,7 +105,11 @@ func (g *Generator) fromFieldList(structName string, fieldList *ast.FieldList) (
 }
 
 func (g *Generator) fromField(structName string, field *ast.Field) (*tuple.T2[string, string], error) {
-	directive := g.fromTag(field.Tag)
+	directive, err := g.fromTag(field.Tag)
+	if err != nil {
+		return nil, errors.Wrap(err, "fail to g.fromTag()")
+	}
+
 	if len(directive) == 0 || directive == "-" {
 		return nil, nil
 	}
@@ -120,15 +124,19 @@ func (g *Generator) fromField(structName string, field *ast.Field) (*tuple.T2[st
 	}, nil
 }
 
-func (g *Generator) fromTag(tag *ast.BasicLit) string {
+func (g *Generator) fromTag(tag *ast.BasicLit) (string, error) {
 	if tag == nil {
-		return ""
+		return "", nil
 	}
 
-	tagValue, _ := strconv.Unquote(tag.Value)
-	directive := strings.Trim(reflect.StructTag(tagValue).Get(g.config.TagName), " ")
+	t1, err := strconv.Unquote(tag.Value)
+	if err != nil {
+		return "", errors.Wrap(err, "fail to strconv.Unquote()")
+	}
 
-	return directive
+	t2 := strings.Trim(reflect.StructTag(t1).Get(g.config.TagName), " ")
+
+	return t2, nil
 }
 
 func (g *Generator) fromStringStringPair(acc *tuple.T2[[]ast.Spec, []ast.Expr], v *tuple.T2[string, string]) (*tuple.T2[[]ast.Spec, []ast.Expr], error) {
