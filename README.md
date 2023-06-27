@@ -3,6 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/hidori/go-tools/badge.svg?branch=main)](https://coveralls.io/github/hidori/go-tools?branch=main)
 [![Maintainability](https://api.codeclimate.com/v1/badges/979abcdc61b3f820e6ad/maintainability)](https://codeclimate.com/github/hidori/go-tools/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/979abcdc61b3f820e6ad/test_coverage)](https://codeclimate.com/github/hidori/go-tools/test_coverage)
+[![CodeQL](https://github.com/hidori/go-tools/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/hidori/go-tools/actions/workflows/github-code-scanning/codeql)
 
 # Go Tools
 
