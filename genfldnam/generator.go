@@ -6,7 +6,6 @@ import (
 	"go/token"
 	"reflect"
 	"strconv"
-	"strings"
 
 	"github.com/barweiss/go-tuple"
 	"github.com/hidori/go-tools/astutil"
@@ -106,7 +105,7 @@ func (g *Generator) fromFieldList(structName string, fieldList *ast.FieldList) (
 
 func (g *Generator) fromField(structName string, field *ast.Field) (*tuple.T2[string, string], error) {
 	directive := g.fromTag(field.Tag)
-	if len(directive) == 0 || directive == "-" {
+	if directive == "" || directive == "-" {
 		return nil, nil
 	}
 
@@ -125,10 +124,10 @@ func (g *Generator) fromTag(tag *ast.BasicLit) string {
 		return ""
 	}
 
-	tagValue, _ := strconv.Unquote(tag.Value)
-	directive := strings.Trim(reflect.StructTag(tagValue).Get(g.config.TagName), " ")
+	t1, _ := strconv.Unquote(tag.Value)
+	t2 := reflect.StructTag(t1).Get(g.config.TagName)
 
-	return directive
+	return t2
 }
 
 func (g *Generator) fromStringStringPair(acc *tuple.T2[[]ast.Spec, []ast.Expr], v *tuple.T2[string, string]) (*tuple.T2[[]ast.Spec, []ast.Expr], error) {

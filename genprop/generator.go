@@ -95,11 +95,12 @@ func (g *Generator) fromFieldList(structName string, fieldList *ast.FieldList) l
 }
 
 func (g *Generator) fromField(structName string, field *ast.Field) (linq.Enumerable[ast.Decl], error) {
-	e1, err := g.fromTag(field.Tag)
-	if err != nil {
-		return nil, errors.Wrap(err, "fail to g.fromTag()")
+	directives := g.fromTag(field.Tag)
+	if len(directives) == 0 || (len(directives) == 1 && (directives[0] == "" || directives[0] == "-")) {
+		return linq.Empty[ast.Decl](), nil
 	}
 
+	e1 := linq.FromSlice(directives)
 	e2 := linq.Select(e1, func(v string) (ast.Decl, error) {
 		switch v {
 		case "get":
@@ -116,27 +117,15 @@ func (g *Generator) fromField(structName string, field *ast.Field) (linq.Enumera
 	return e2, nil
 }
 
-func (g *Generator) fromTag(tag *ast.BasicLit) (linq.Enumerable[string], error) {
+func (g *Generator) fromTag(tag *ast.BasicLit) []string {
 	if tag == nil {
-		return linq.Empty[string](), nil
+		return []string{}
 	}
 
-	t1, err := strconv.Unquote(tag.Value)
-	if err != nil {
-		return nil, errors.Wrap(err, "fail to strconv.Unquote()")
-	}
+	t1, _ := strconv.Unquote(tag.Value)
+	t2 := reflect.StructTag(t1).Get(g.config.TagName)
 
-	t2 := strings.Trim(reflect.StructTag(t1).Get(g.config.TagName), " ")
-	if t2 == "" || t2 == "-" {
-		return linq.Empty[string](), nil
-	}
-
-	e1 := linq.FromSlice(strings.Split(strings.Trim(t2, " "), ","))
-	e2 := linq.Select(e1, func(v string) (string, error) {
-		return strings.Trim(v, " "), nil
-	})
-
-	return e2, nil
+	return strings.Split(t2, ",")
 }
 
 func (g *Generator) newGetterFuncDecl(structName string, field *ast.Field) ast.Decl {
