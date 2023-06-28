@@ -16,9 +16,9 @@
 ## Reusable Libraries
 
 * [astutil](./astutil/)
-* [empty](./empty/)
 * [genfldnam](./genfldnam/)
 * [genprop](./genprop/)
+* [linqutil](./linqutil/)
 * [must](./must/)
-* [ptr](./ptr/)
+* [pointer](./pointer/)
 * [runtime](./runtime/)
