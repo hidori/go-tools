@@ -1,5 +1,5 @@
-github.com/barweiss/go-tuple v1.1.1 h1:0dLwRqJHHpU9c5iJLF9Xjl5yEPDXwh5FhigydBoM5MM=
-github.com/barweiss/go-tuple v1.1.1/go.mod h1:oX3AtZyuGnCuK3B4PlUIfR9spxyJ42bgTSqCI9GkPB0=
+github.com/barweiss/go-tuple v1.1.2 h1:ul9tIW0LZ5w+Vk/Hi3X9z3JyqkD0yaVGZp+nNTLW2YE=
+github.com/barweiss/go-tuple v1.1.2/go.mod h1:SpoVilkI7ycNrIkQxcQfS1JG5A+R40sWwEUlPONlp3k=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/makiuchi-d/linq/v2 v2.0.0 h1:J/W0Vf705wcHGEBCSxteS3a1xe/ovfsPIYCL8QuW8RM=
